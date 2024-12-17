@@ -15,7 +15,7 @@ pipeline {
         stage('Build Services') {
             steps {
                 script {
-                    // Use 'docker-compose' commands for Windows (use 'bat' instead of 'sh')
+                    // Build the services
                     bat "docker-compose -f %DOCKER_COMPOSE_FILE% build"
                 }
             }
@@ -24,7 +24,7 @@ pipeline {
         stage('Start Services') {
             steps {
                 script {
-                    // Start the containers in detached mode
+                    // Start the services in detached mode
                     bat "docker-compose -f %DOCKER_COMPOSE_FILE% up -d"
                 }
             }
@@ -33,9 +33,20 @@ pipeline {
         stage('Wait for DB to be Ready') {
             steps {
                 script {
-                    // Optionally, wait for the database service to be ready before running tests
-                    // Use a check for PostgreSQL readiness (adjust for your DB if needed)
-                    bat "docker-compose -f %DOCKER_COMPOSE_FILE% exec -T db pg_isready -U postgres"
+                    // Retry logic for waiting for PostgreSQL readiness
+                    def retries = 10
+                    def success = false
+                    for (int i = 0; i < retries; i++) {
+                        def result = bat(script: "docker-compose -f %DOCKER_COMPOSE_FILE% exec -T db pg_isready -U postgres", returnStatus: true)
+                        if (result == 0) {
+                            success = true
+                            break
+                        }
+                        sleep(time: 5, unit: 'SECONDS') // Wait for 5 seconds before retrying
+                    }
+                    if (!success) {
+                        error "PostgreSQL is not ready after ${retries} attempts"
+                    }
                 }
             }
         }
@@ -43,8 +54,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    // Run your test commands for your microservices here
-                    // Example: Run integration tests on the user_service, bank_service, etc.
+                    // Run tests for the services
                     bat "docker-compose -f %DOCKER_COMPOSE_FILE% exec -T accounts_service pytest tests/"
                 }
             }
@@ -53,7 +63,7 @@ pipeline {
         stage('Stop Services') {
             steps {
                 script {
-                    // Stop the services once tests are completed
+                    // Stop the services
                     bat "docker-compose -f %DOCKER_COMPOSE_FILE% down"
                 }
             }
@@ -62,7 +72,7 @@ pipeline {
 
     post {
         always {
-            // Clean up and stop services after every pipeline run
+            // Clean up after pipeline run
             bat "docker-compose -f %DOCKER_COMPOSE_FILE% down --volumes --remove-orphans"
         }
     }
