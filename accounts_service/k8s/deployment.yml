@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: accounts-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: accounts-service
+  template:
+    metadata:
+      labels:
+        app: accounts-service
+    spec:
+      containers:
+        - name: accounts-service
+          image: badryb/finether-accounts-service:latest
+          ports:
+            - containerPort: 8003
+          env:
+            - name: DATABASE_URL
+              value: "postgresql://postgres:1234@db:5432/projet_python_accounts"
+            - name: USER_SERVICE_URL
+              value: "http://user-service:8001"
+            - name: BANK_SERVICE_URL
+              value: "http://bank-service:8002"
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"

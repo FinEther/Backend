@@ -1,15 +1,15 @@
 pipeline {
     agent any
     environment {
-        DOCKER_IMAGE_PREFIX = 'badryb/fintech' // Préfixe des images Docker
+        DOCKER_IMAGE_PREFIX = 'badryb/finether' // Docker Hub repository
     }
     triggers {
-        githubPush() // Déclenchement sur push GitHub
+        githubPush() // Trigger on GitHub push events
     }
     stages {
         stage('Clone Repository') {
             steps {
-                echo 'Clonage du repository...'
+                echo 'Cloning repository...'
                 checkout scm
             }
         }
@@ -17,7 +17,7 @@ pipeline {
             parallel {
                 stage('Build User Service Image') {
                     steps {
-                        echo 'Construction de l\'image Docker pour user_service...'
+                        echo 'Building Docker image for user-service...'
                         bat '''
                             docker build -t %DOCKER_IMAGE_PREFIX%-user-service -f user_service/Dockerfile user_service
                         '''
@@ -25,7 +25,7 @@ pipeline {
                 }
                 stage('Build Bank Service Image') {
                     steps {
-                        echo 'Construction de l\'image Docker pour bank_service...'
+                        echo 'Building Docker image for bank-service...'
                         bat '''
                             docker build -t %DOCKER_IMAGE_PREFIX%-bank-service -f bank_service/Dockerfile bank_service
                         '''
@@ -33,7 +33,7 @@ pipeline {
                 }
                 stage('Build Accounts Service Image') {
                     steps {
-                        echo 'Construction de l\'image Docker pour accounts_service...'
+                        echo 'Building Docker image for accounts-service...'
                         bat '''
                             docker build -t %DOCKER_IMAGE_PREFIX%-accounts-service -f accounts_service/Dockerfile accounts_service
                         '''
@@ -45,7 +45,7 @@ pipeline {
             parallel {
                 stage('Push User Service Image') {
                     steps {
-                        echo 'Poussée de l\'image user_service vers Docker Hub...'
+                        echo 'Pushing Docker image for user-service to Docker Hub...'
                         withCredentials([usernamePassword(credentialsId: 'DockerHub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
                             bat '''
                                 docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%
@@ -56,7 +56,7 @@ pipeline {
                 }
                 stage('Push Bank Service Image') {
                     steps {
-                        echo 'Poussée de l\'image bank_service vers Docker Hub...'
+                        echo 'Pushing Docker image for bank-service to Docker Hub...'
                         withCredentials([usernamePassword(credentialsId: 'DockerHub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
                             bat '''
                                 docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%
@@ -67,7 +67,7 @@ pipeline {
                 }
                 stage('Push Accounts Service Image') {
                     steps {
-                        echo 'Poussée de l\'image accounts_service vers Docker Hub...'
+                        echo 'Pushing Docker image for accounts-service to Docker Hub...'
                         withCredentials([usernamePassword(credentialsId: 'DockerHub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
                             bat '''
                                 docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%
@@ -79,25 +79,52 @@ pipeline {
             }
         }
         stage('Deploy to Kubernetes') {
-            steps {
-                echo 'Déploiement des services sur Kubernetes...'
-                withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
-                    bat '''
-                        kubectl apply -f k8s/ --kubeconfig=%KUBECONFIG%
-                        kubectl rollout status deployment/user-service --kubeconfig=%KUBECONFIG%
-                        kubectl rollout status deployment/bank-service --kubeconfig=%KUBECONFIG%
-                        kubectl rollout status deployment/accounts-service --kubeconfig=%KUBECONFIG%
-                    '''
+            parallel {
+                stage('Deploy User Service') {
+                    steps {
+                        echo 'Deploying user-service to Kubernetes...'
+                        withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
+                            bat '''
+                                kubectl apply -f user_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG%
+                                kubectl apply -f user_service/k8s/service.yml --kubeconfig=%KUBECONFIG%
+                                kubectl rollout status deployment/user-service --kubeconfig=%KUBECONFIG%
+                            '''
+                        }
+                    }
+                }
+                stage('Deploy Bank Service') {
+                    steps {
+                        echo 'Deploying bank-service to Kubernetes...'
+                        withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
+                            bat '''
+                                kubectl apply -f bank_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG%
+                                kubectl apply -f bank_service/k8s/service.yml --kubeconfig=%KUBECONFIG%
+                                kubectl rollout status deployment/bank-service --kubeconfig=%KUBECONFIG%
+                            '''
+                        }
+                    }
+                }
+                stage('Deploy Accounts Service') {
+                    steps {
+                        echo 'Deploying accounts-service to Kubernetes...'
+                        withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
+                            bat '''
+                                kubectl apply -f accounts_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG%
+                                kubectl apply -f accounts_service/k8s/service.yml --kubeconfig=%KUBECONFIG%
+                                kubectl rollout status deployment/accounts-service --kubeconfig=%KUBECONFIG%
+                            '''
+                        }
+                    }
                 }
             }
         }
     }
     post {
         success {
-            echo 'Le pipeline a été exécuté avec succès pour tous les services.'
+            echo 'Pipeline completed successfully for all services.'
         }
         failure {
-            echo 'Le pipeline a échoué. Vérifiez les logs pour plus de détails.'
+            echo 'Pipeline failed. Please check the logs for details.'
         }
     }
 }

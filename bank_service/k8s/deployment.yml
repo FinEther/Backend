@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bank-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bank-service
+  template:
+    metadata:
+      labels:
+        app: bank-service
+    spec:
+      containers:
+        - name: bank-service
+          image: badryb/finether-bank-service:latest
+          ports:
+            - containerPort: 8002
+          env:
+            - name: DATABASE_URL
+              value: "postgresql://postgres:1234@db:5432/projet_python_bank"
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
