@@ -1,130 +1,70 @@
 pipeline {
     agent any
     environment {
-        DOCKER_IMAGE_PREFIX = 'badryb/finether' // Docker Hub repository
+        DOCKER_COMPOSE_FILE = 'docker-compose.yml'  // Docker Compose file
+        IMAGE_TAG = "latest"  // Docker image tag for each service
     }
-    triggers {
-        githubPush() // Trigger on GitHub push events
-    }
+
     stages {
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
-                echo 'Cloning repository...'
-                checkout scm
+                checkout scm  // Checkout the repository
             }
         }
-        stage('Build Docker Images') {
-            parallel {
-                stage('Build User Service Image') {
-                    steps {
-                        echo 'Building Docker image for user-service...'
-                        bat '''
-                            docker build -t %DOCKER_IMAGE_PREFIX%-user-service -f user_service/Dockerfile user_service
-                        '''
-                    }
-                }
-                stage('Build Bank Service Image') {
-                    steps {
-                        echo 'Building Docker image for bank-service...'
-                        bat '''
-                            docker build -t %DOCKER_IMAGE_PREFIX%-bank-service -f bank_service/Dockerfile bank_service
-                        '''
-                    }
-                }
-                stage('Build Accounts Service Image') {
-                    steps {
-                        echo 'Building Docker image for accounts-service...'
-                        bat '''
-                            docker build -t %DOCKER_IMAGE_PREFIX%-accounts-service -f accounts_service/Dockerfile accounts_service
-                        '''
-                    }
+
+        stage('Build Services') {
+            steps {
+                script {
+                    // Build the services defined in the docker-compose.yml
+                    sh 'docker-compose -f ${DOCKER_COMPOSE_FILE} build'
                 }
             }
         }
-        stage('Push to Docker Hub') {
-            parallel {
-                stage('Push User Service Image') {
-                    steps {
-                        echo 'Pushing Docker image for user-service to Docker Hub...'
-                        withCredentials([usernamePassword(credentialsId: 'DockerHub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                            bat '''
-                                docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%
-                                docker push %DOCKER_IMAGE_PREFIX%-user-service
-                            '''
-                        }
-                    }
-                }
-                stage('Push Bank Service Image') {
-                    steps {
-                        echo 'Pushing Docker image for bank-service to Docker Hub...'
-                        withCredentials([usernamePassword(credentialsId: 'DockerHub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                            bat '''
-                                docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%
-                                docker push %DOCKER_IMAGE_PREFIX%-bank-service
-                            '''
-                        }
-                    }
-                }
-                stage('Push Accounts Service Image') {
-                    steps {
-                        echo 'Pushing Docker image for accounts-service to Docker Hub...'
-                        withCredentials([usernamePassword(credentialsId: 'DockerHub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                            bat '''
-                                docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%
-                                docker push %DOCKER_IMAGE_PREFIX%-accounts-service
-                            '''
-                        }
-                    }
+
+        stage('Start Services') {
+            steps {
+                script {
+                    // Start the containers in detached mode
+                    sh 'docker-compose -f ${DOCKER_COMPOSE_FILE} up -d'
                 }
             }
         }
-        stage('Deploy to Kubernetes') {
-            parallel {
-                stage('Deploy User Service') {
-                    steps {
-                        echo 'Deploying user-service to Kubernetes...'
-                        withCredentials([file(credentialsId: 'MyKubeConfig2', variable: 'KUBECONFIG')]) {
-                            bat '''
-                                kubectl apply -f user_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG% 
-                                kubectl apply -f user_service/k8s/service.yml --kubeconfig=%KUBECONFIG% 
-                                kubectl rollout status deployment/user-service --kubeconfig=%KUBECONFIG%
-                            '''
-                        }
-                    }
+
+        stage('Wait for DB to be Ready') {
+            steps {
+                script {
+                    // Optionally, wait for the database service to be ready before running tests
+                    // This is just a simple wait, you can use more sophisticated methods like checking DB health
+                    sh 'docker-compose -f ${DOCKER_COMPOSE_FILE} exec -T db pg_isready -U postgres'
                 }
-                stage('Deploy Bank Service') {
-                    steps {
-                        echo 'Deploying bank-service to Kubernetes...'
-                        withCredentials([file(credentialsId: 'MyKubeConfig2', variable: 'KUBECONFIG')]) {
-                            bat '''
-                                kubectl apply -f bank_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG% 
-                                kubectl apply -f bank_service/k8s/service.yml --kubeconfig=%KUBECONFIG% 
-                                kubectl rollout status deployment/bank-service --kubeconfig=%KUBECONFIG%
-                            '''
-                        }
-                    }
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                script {
+                    // Run your test commands for your microservices here
+                    // Example: Run integration tests on the user_service, bank_service, etc.
+                    // For instance, assuming you have a test suite or API tests:
+                    sh 'docker-compose -f ${DOCKER_COMPOSE_FILE} exec -T accounts_service pytest tests/'
                 }
-                stage('Deploy Accounts Service') {
-                    steps {
-                        echo 'Deploying accounts-service to Kubernetes...'
-                        withCredentials([file(credentialsId: 'MyKubeConfig2', variable: 'KUBECONFIG')]) {
-                            bat '''
-                                kubectl apply -f accounts_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG% 
-                                kubectl apply -f accounts_service/k8s/service.yml --kubeconfig=%KUBECONFIG% 
-                                kubectl rollout status deployment/accounts-service --kubeconfig=%KUBECONFIG%
-                            '''
-                        }
-                    }
+            }
+        }
+
+        stage('Stop Services') {
+            steps {
+                script {
+                    // Stop the services once tests are completed
+                    sh 'docker-compose -f ${DOCKER_COMPOSE_FILE} down'
                 }
             }
         }
     }
+
     post {
-        success {
-            echo 'Pipeline completed successfully for all services.'
-        }
-        failure {
-            echo 'Pipeline failed. Please check the logs for details.'
+        always {
+            // Clean up and stop services after every pipeline run
+            sh 'docker-compose -f ${DOCKER_COMPOSE_FILE} down --volumes --remove-orphans'
         }
     }
 }
