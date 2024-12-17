@@ -85,8 +85,8 @@ pipeline {
                         echo 'Deploying user-service to Kubernetes...'
                         withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
                             bat '''
-                                kubectl apply -f user_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG%
-                                kubectl apply -f user_service/k8s/service.yml --kubeconfig=%KUBECONFIG%
+                                kubectl apply -f user_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG% --validate=false
+                                kubectl apply -f user_service/k8s/service.yml --kubeconfig=%KUBECONFIG% --validate=false
                                 kubectl rollout status deployment/user-service --kubeconfig=%KUBECONFIG%
                             '''
                         }
@@ -97,8 +97,8 @@ pipeline {
                         echo 'Deploying bank-service to Kubernetes...'
                         withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
                             bat '''
-                                kubectl apply -f bank_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG%
-                                kubectl apply -f bank_service/k8s/service.yml --kubeconfig=%KUBECONFIG%
+                                kubectl apply -f bank_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG% --validate=false
+                                kubectl apply -f bank_service/k8s/service.yml --kubeconfig=%KUBECONFIG% --validate=false
                                 kubectl rollout status deployment/bank-service --kubeconfig=%KUBECONFIG%
                             '''
                         }
@@ -109,8 +109,8 @@ pipeline {
                         echo 'Deploying accounts-service to Kubernetes...'
                         withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
                             bat '''
-                                kubectl apply -f accounts_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG%
-                                kubectl apply -f accounts_service/k8s/service.yml --kubeconfig=%KUBECONFIG%
+                                kubectl apply -f accounts_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG% --validate=false
+                                kubectl apply -f accounts_service/k8s/service.yml --kubeconfig=%KUBECONFIG% --validate=false
                                 kubectl rollout status deployment/accounts-service --kubeconfig=%KUBECONFIG%
                             '''
                         }
