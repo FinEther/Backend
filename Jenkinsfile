@@ -16,7 +16,7 @@ pipeline {
             steps {
                 script {
                     // Use 'docker-compose' commands for Windows (use 'bat' instead of 'sh')
-                    bat 'docker-compose -f ${DOCKER_COMPOSE_FILE} build'
+                    bat "docker-compose -f %DOCKER_COMPOSE_FILE% build"
                 }
             }
         }
@@ -25,7 +25,7 @@ pipeline {
             steps {
                 script {
                     // Start the containers in detached mode
-                    bat 'docker-compose -f ${DOCKER_COMPOSE_FILE} up -d'
+                    bat "docker-compose -f %DOCKER_COMPOSE_FILE% up -d"
                 }
             }
         }
@@ -35,7 +35,7 @@ pipeline {
                 script {
                     // Optionally, wait for the database service to be ready before running tests
                     // Use a check for PostgreSQL readiness (adjust for your DB if needed)
-                    bat 'docker-compose -f ${DOCKER_COMPOSE_FILE} exec -T db pg_isready -U postgres'
+                    bat "docker-compose -f %DOCKER_COMPOSE_FILE% exec -T db pg_isready -U postgres"
                 }
             }
         }
@@ -45,7 +45,7 @@ pipeline {
                 script {
                     // Run your test commands for your microservices here
                     // Example: Run integration tests on the user_service, bank_service, etc.
-                    bat 'docker-compose -f ${DOCKER_COMPOSE_FILE} exec -T accounts_service pytest tests/'
+                    bat "docker-compose -f %DOCKER_COMPOSE_FILE% exec -T accounts_service pytest tests/"
                 }
             }
         }
@@ -54,7 +54,7 @@ pipeline {
             steps {
                 script {
                     // Stop the services once tests are completed
-                    bat 'docker-compose -f ${DOCKER_COMPOSE_FILE} down'
+                    bat "docker-compose -f %DOCKER_COMPOSE_FILE% down"
                 }
             }
         }
@@ -63,7 +63,7 @@ pipeline {
     post {
         always {
             // Clean up and stop services after every pipeline run
-            bat 'docker-compose -f ${DOCKER_COMPOSE_FILE} down --volumes --remove-orphans'
+            bat "docker-compose -f %DOCKER_COMPOSE_FILE% down --volumes --remove-orphans"
         }
     }
 }
