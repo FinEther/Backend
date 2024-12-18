@@ -7,8 +7,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:1234@db:5432/projet_python_user
     depends_on:
-      db:
-        condition: service_healthy
+      - db
 
   bank_service:
     build:
@@ -18,8 +17,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:1234@db:5432/projet_python_bank
     depends_on:
-      db:
-        condition: service_healthy
+      - db
 
   accounts_service:
     build:
@@ -31,28 +29,25 @@ services:
       - USER_SERVICE_URL=http://user_service:8001
       - BANK_SERVICE_URL=http://bank_service:8002
     depends_on:
-      db:
-        condition: service_healthy
-      user_service:
-        condition: service_started
-      bank_service:
-        condition: service_started
+      - db
+      - user_service
+      - bank_service
 
   db:
     image: postgres:latest
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=1234
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5434:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "postgres"]
       interval: 10s
-      retries: 5
-      start_period: 30s
+      retries: 10
+      start_period: 10s
       timeout: 10s
 
 volumes:

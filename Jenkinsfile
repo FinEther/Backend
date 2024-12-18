@@ -8,15 +8,19 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm  // Checkout the repository
+                script {
+                    echo "Checking out the repository..."
+                    checkout scm  // Checkout the repository
+                }
             }
         }
 
         stage('Build Services') {
             steps {
                 script {
-                    // Build the services
-                    bat "docker-compose -f %DOCKER_COMPOSE_FILE% build"
+                    echo "Building Docker services..."
+                    // Build the services with error handling
+                    bat "docker-compose -f %DOCKER_COMPOSE_FILE% build || exit 1"
                 }
             }
         }
@@ -24,8 +28,9 @@ pipeline {
         stage('Start Services') {
             steps {
                 script {
-                    // Start the services in detached mode
-                    bat "docker-compose -f %DOCKER_COMPOSE_FILE% up -d"
+                    echo "Starting Docker services..."
+                    // Start the services in detached mode with error handling
+                    bat "docker-compose -f %DOCKER_COMPOSE_FILE% up -d || exit 1"
                 }
             }
         }
@@ -33,19 +38,22 @@ pipeline {
         stage('Wait for DB to be Ready') {
             steps {
                 script {
+                    echo "Waiting for PostgreSQL to be ready..."
                     // Retry logic for waiting for PostgreSQL readiness
-                    def retries = 20
+                    def retries = 30
                     def success = false
                     for (int i = 0; i < retries; i++) {
                         def result = bat(script: "docker-compose -f %DOCKER_COMPOSE_FILE% exec -T db pg_isready -U postgres", returnStatus: true)
                         if (result == 0) {
                             success = true
+                            echo "PostgreSQL is ready."
                             break
                         }
-                        sleep(time: 10, unit: 'SECONDS') // Wait for 5 seconds before retrying
+                        echo "PostgreSQL is not ready yet, retrying (${i + 1}/${retries})..."
+                        sleep(time: 10, unit: 'SECONDS') // Wait for 10 seconds before retrying
                     }
                     if (!success) {
-                        error "PostgreSQL is not ready after ${retries} attempts"
+                        error "PostgreSQL is not ready after ${retries} attempts. Exiting pipeline."
                     }
                 }
             }
@@ -54,8 +62,9 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    // Run tests for the services
-                    bat "docker-compose -f %DOCKER_COMPOSE_FILE% exec -T accounts_service pytest tests/"
+                    echo "Running tests for the accounts_service..."
+                    // Run tests with error handling
+                    bat "docker-compose -f %DOCKER_COMPOSE_FILE% exec -T accounts_service pytest tests/ || exit 1"
                 }
             }
         }
@@ -63,8 +72,9 @@ pipeline {
         stage('Stop Services') {
             steps {
                 script {
-                    // Stop the services
-                    bat "docker-compose -f %DOCKER_COMPOSE_FILE% down"
+                    echo "Stopping Docker services..."
+                    // Stop the services gracefully
+                    bat "docker-compose -f %DOCKER_COMPOSE_FILE% down || exit 1"
                 }
             }
         }
@@ -72,8 +82,17 @@ pipeline {
 
     post {
         always {
-            // Clean up after pipeline run
-            bat "docker-compose -f %DOCKER_COMPOSE_FILE% down --volumes --remove-orphans"
+            script {
+                echo "Cleaning up Docker resources..."
+                // Ensure all resources are cleaned up
+                bat "docker-compose -f %DOCKER_COMPOSE_FILE% down --volumes --remove-orphans || echo 'Cleanup already performed or containers not running.'"
+            }
+        }
+        success {
+            echo "Pipeline completed successfully!"
+        }
+        failure {
+            echo "Pipeline failed. Please check logs for details."
         }
     }
 }
