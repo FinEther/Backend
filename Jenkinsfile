@@ -83,7 +83,7 @@ pipeline {
                 stage('Deploy Database') {
                     steps {
                         echo 'Deploying database to Kubernetes...'
-                        withCredentials([file(credentialsId: 'MyKubeConfig2', variable: 'KUBECONFIG')]) {
+                        withCredentials([file(credentialsId: 'MyKubeConfig3', variable: 'KUBECONFIG')]) {
                             bat '''
                                 kubectl apply -f db/pvc.yml --kubeconfig=%KUBECONFIG% 
                                 kubectl apply -f db/deployment.yml --kubeconfig=%KUBECONFIG% 
@@ -95,7 +95,7 @@ pipeline {
                 stage('Deploy User Service') {
                     steps {
                         echo 'Deploying user-service to Kubernetes...'
-                        withCredentials([file(credentialsId: 'MyKubeConfig2', variable: 'KUBECONFIG')]) {
+                        withCredentials([file(credentialsId: 'MyKubeConfig3', variable: 'KUBECONFIG')]) {
                             bat '''
                                 kubectl apply -f user_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG% 
                                 kubectl apply -f user_service/k8s/service.yml --kubeconfig=%KUBECONFIG%
@@ -106,7 +106,7 @@ pipeline {
                 stage('Deploy Bank Service') {
                     steps {
                         echo 'Deploying bank-service to Kubernetes...'
-                        withCredentials([file(credentialsId: 'MyKubeConfig2', variable: 'KUBECONFIG')]) {
+                        withCredentials([file(credentialsId: 'MyKubeConfig3', variable: 'KUBECONFIG')]) {
                             bat '''
                                 kubectl apply -f bank_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG% 
                                 kubectl apply -f bank_service/k8s/service.yml --kubeconfig=%KUBECONFIG%
@@ -117,7 +117,7 @@ pipeline {
                 stage('Deploy Accounts Service') {
                     steps {
                         echo 'Deploying accounts-service to Kubernetes...'
-                        withCredentials([file(credentialsId: 'MyKubeConfig2', variable: 'KUBECONFIG')]) {
+                        withCredentials([file(credentialsId: 'MyKubeConfig3', variable: 'KUBECONFIG')]) {
                             bat '''
                                 kubectl apply -f accounts_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG% 
                                 kubectl apply -f accounts_service/k8s/service.yml --kubeconfig=%KUBECONFIG%
