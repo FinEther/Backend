@@ -34,7 +34,7 @@ pipeline {
             steps {
                 script {
                     // Retry logic for waiting for PostgreSQL readiness
-                    def retries = 10
+                    def retries = 20
                     def success = false
                     for (int i = 0; i < retries; i++) {
                         def result = bat(script: "docker-compose -f %DOCKER_COMPOSE_FILE% exec -T db pg_isready -U postgres", returnStatus: true)
@@ -42,7 +42,7 @@ pipeline {
                             success = true
                             break
                         }
-                        sleep(time: 5, unit: 'SECONDS') // Wait for 5 seconds before retrying
+                        sleep(time: 10, unit: 'SECONDS') // Wait for 5 seconds before retrying
                     }
                     if (!success) {
                         error "PostgreSQL is not ready after ${retries} attempts"
