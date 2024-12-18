@@ -19,7 +19,7 @@ spec:
             - containerPort: 8001
           env:
             - name: DATABASE_URL
-              value: "postgresql://postgres:1234@db:5432/projet_python_user"
+              value: "postgresql://postgres:1234@postgres:5432/projet_python_user"
           resources:
             limits:
               memory: "512Mi"
