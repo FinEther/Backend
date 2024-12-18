@@ -13,12 +13,12 @@ spec:
     metadata:
       labels:
         app: postgres
-    spec:
+  spec:
     containers:
       - name: postgres
         image: postgres:latest
         ports:
-          - containerPort: 5432
+          - containerPort: 5434
         env:
           - name: POSTGRES_USER
             value: postgres
