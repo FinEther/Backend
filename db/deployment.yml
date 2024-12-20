@@ -20,12 +20,12 @@ spec:
         ports:
           - containerPort: 5434
         env:
+          - name: POSTGRES_USER
+            value: postgres
+          - name: POSTGRES_PASSWORD
+            value: 1234
           - name: POSTGRES_DB
-            value: projet_python_accounts
-          - name: POSTGRES_DB
-            value: projet_python_bank
-          - name: POSTGRES_DB
-            value: projet_python_user
+            value: projet_python_accounts, projet_python_bank, projet_python_user
         volumeMounts:
           - name: postgres-storage
             mountPath: /var/lib/postgresql/data
