@@ -1,10 +1,10 @@
 pipeline {
     agent any
     environment {
-        DOCKER_IMAGE_PREFIX = 'badryb/finether' // Docker Hub repository
+        DOCKER_IMAGE_PREFIX = 'badryb/finether' // Docker Hub repository prefix
     }
     triggers {
-        githubPush() // Trigger on GitHub push events
+        githubPush() // Trigger the pipeline on GitHub push events
     }
     stages {
         stage('Clone Repository') {
@@ -19,7 +19,7 @@ pipeline {
                     steps {
                         echo 'Building Docker image for user-service...'
                         bat '''
-                            docker build -t %DOCKER_IMAGE_PREFIX%-user-service -f user_service/Dockerfile user_service
+                            docker build -t %DOCKER_IMAGE_PREFIX%-user-service -f user_service/Dockerfile ./user_service
                         '''
                     }
                 }
@@ -27,7 +27,7 @@ pipeline {
                     steps {
                         echo 'Building Docker image for bank-service...'
                         bat '''
-                            docker build -t %DOCKER_IMAGE_PREFIX%-bank-service -f bank_service/Dockerfile bank_service
+                            docker build -t %DOCKER_IMAGE_PREFIX%-bank-service -f bank_service/Dockerfile ./bank_service
                         '''
                     }
                 }
@@ -35,13 +35,13 @@ pipeline {
                     steps {
                         echo 'Building Docker image for accounts-service...'
                         bat '''
-                            docker build -t %DOCKER_IMAGE_PREFIX%-accounts-service -f accounts_service/Dockerfile accounts_service
+                            docker build -t %DOCKER_IMAGE_PREFIX%-accounts-service -f accounts_service/Dockerfile ./accounts_service
                         '''
                     }
                 }
             }
         }
-        stage('Push to Docker Hub') {
+        stage('Push Docker Images') {
             parallel {
                 stage('Push User Service Image') {
                     steps {
@@ -78,20 +78,8 @@ pipeline {
                 }
             }
         }
-        stage('Deploy to Kubernetes') {
+        stage('Deploy Services to Kubernetes') {
             parallel {
-                stage('Deploy Database') {
-                    steps {
-                        echo 'Deploying database to Kubernetes...'
-                        withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
-                            bat '''
-                                kubectl apply -f db/pvc.yml --kubeconfig=%KUBECONFIG% 
-                                kubectl apply -f db/deployment.yml --kubeconfig=%KUBECONFIG% 
-                                kubectl apply -f db/service.yml --kubeconfig=%KUBECONFIG%
-                            '''
-                        }
-                    }
-                }
                 stage('Deploy User Service') {
                     steps {
                         echo 'Deploying user-service to Kubernetes...'
@@ -130,10 +118,10 @@ pipeline {
     }
     post {
         success {
-            echo "Application deployed successfully!"
+            echo "Pipeline completed successfully and services are deployed to Kubernetes!"
         }
         failure {
-            echo "Deployment failed. Check the logs for details."
+            echo "Pipeline failed. Please check the logs for details."
         }
     }
 }
