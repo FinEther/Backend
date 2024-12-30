@@ -1,0 +1,11 @@
+# init-db-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: init-db-script
+  namespace: finether
+data:
+  init.sql: |
+    CREATE DATABASE projet_python_user;
+    CREATE DATABASE projet_python_bank;
+    CREATE DATABASE projet_python_accounts;

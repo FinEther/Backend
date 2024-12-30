@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-script
+  namespace: finether
+data:
+  init.sql: |
+    CREATE DATABASE projet_python_user;
+    CREATE DATABASE projet_python_bank;
+    CREATE DATABASE projet_python_accounts;

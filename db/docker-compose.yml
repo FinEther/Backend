@@ -1,3 +1,5 @@
+version: '4.35.1'
+
 services:
   user_service:
     build:
@@ -5,7 +7,7 @@ services:
     ports:
       - "8001:8001"
     environment:
-      - DATABASE_URL=postgresql://postgres:1234@db:5434/projet_python_user
+      - DATABASE_URL=postgresql://postgres:1234@db:5432/projet_python_user
     depends_on:
       - db
 
@@ -15,7 +17,7 @@ services:
     ports:
       - "8002:8002"
     environment:
-      - DATABASE_URL=postgresql://postgres:1234@db:5434/projet_python_bank
+      - DATABASE_URL=postgresql://postgres:1234@db:5432/projet_python_bank
     depends_on:
       - db
 
@@ -25,16 +27,17 @@ services:
     ports:
       - "8003:8003"
     environment:
-      - DATABASE_URL=postgresql://postgres:1234@db:5434/projet_python_accounts
+      - DATABASE_URL=postgresql://postgres:1234@db:5432/projet_python_accounts
       - USER_SERVICE_URL=http://user_service:8001
       - BANK_SERVICE_URL=http://bank_service:8002
+
     depends_on:
       - db
       - user_service
       - bank_service
 
   db:
-    image: postgres:latest
+    image: postgres:14.0
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 1234
@@ -42,13 +45,8 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "5434:5434"
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "postgres"]
-      interval: 10s
-      retries: 10
-      start_period: 10s
-      timeout: 10s
+      - "5434:5432"
+    
 
 volumes:
   postgres_data:
