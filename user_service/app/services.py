@@ -1,4 +1,6 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+from fastapi import HTTPException
 from .db_models import User
 from .schemas import UserCreate
 from .security import verify_password, get_password_hash
@@ -16,10 +18,18 @@ def create_user(db: Session, user: UserCreate):
         full_name=user.full_name,
         hashed_password=hashed_password,
     )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+    try:
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+    except IntegrityError as e:
+        db.rollback()
+        if "username" in str(e.orig):
+            raise HTTPException(status_code=400, detail="Username already exists")
+        elif "email" in str(e.orig):
+            raise HTTPException(status_code=400, detail="Email already exists")
+        raise HTTPException(status_code=400, detail="Error creating user")
 
 
 def authenticate_user(db: Session, username: str, password: str):

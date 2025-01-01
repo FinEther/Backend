@@ -1,3 +1,4 @@
+# user-service-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,20 +16,12 @@ spec:
     spec:
       containers:
         - name: user-service
-          image: badryb/finether-user-service:latest
+          image: badryb/finether-user-service:v2
           ports:
             - containerPort: 8001
           env:
             - name: DATABASE_URL
-              value: "postgresql://postgres:1234@postgres:5432/projet_python_user"
-          resources:
-            limits:
-              memory: "512Mi"
-              cpu: "500m"
-            requests:
-              memory: "256Mi"
-              cpu: "250m"
-
+              value: postgresql://postgres:1234@user-db-service:5432/projet_python_user
 ---
 apiVersion: v1
 kind: Service
@@ -36,8 +29,9 @@ metadata:
   name: user-service
   namespace: finether
 spec:
+  selector:
+    app: user-service
   ports:
     - port: 8001
       targetPort: 8001
-  selector:
-    app: user-service
+  type: ClusterIP

@@ -36,7 +36,7 @@ def get_bank_accounts_by_user(user_id: int, db: Session = Depends(database.get_d
         raise HTTPException(status_code=404, detail="No bank accounts found for this user")
     return accounts
 
-@app.get("/my-bank-accounts", response_model=List[schemas.BankAccount])
+@app.get("/my-bank-accounts", response_model=schemas.BankAccount)
 def get_my_bank_accounts(db: Session = Depends(database.get_db), token: str = Depends(oauth2_scheme)):
     user_id = services.verify_user(token)
     accounts = services.get_bank_accounts_by_user(db, user_id) 
@@ -53,7 +53,7 @@ def user_to_user_transaction(
 ):
     sender_id=services.verify_user(token)
     sender_account=services.get_bank_accounts_by_user(db,sender_id)
-    sender=sender_account[0]
+    sender=sender_account
     receiver_id=services.get_id_by_username(uutransaction.receiver_username)
     receiver=db.query(models.BankAccount).filter_by(user_id=receiver_id).first()
     if not sender:

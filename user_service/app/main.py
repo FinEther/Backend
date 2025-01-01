@@ -28,7 +28,7 @@ def login_for_access_token(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-@app.post("/users/register", response_model=schemas.UserCreate)
+@app.post("/users/register", response_model=schemas.UserBase)
 async def create_user_route(user_create: schemas.UserCreate, db: Session = Depends(database.get_db)):
     db_user = services.create_user(db, user_create)
     if not db_user:

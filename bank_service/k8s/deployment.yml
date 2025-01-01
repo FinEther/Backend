@@ -20,15 +20,7 @@ spec:
             - containerPort: 8002
           env:
             - name: DATABASE_URL
-              value: "postgresql://postgres:1234@postgres:5432/projet_python_bank"
-          resources:
-            limits:
-              memory: "512Mi"
-              cpu: "500m"
-            requests:
-              memory: "256Mi"
-              cpu: "250m"
-
+              value: postgresql://postgres:1234@bank-db-service:5432/projet_python_bank
 ---
 apiVersion: v1
 kind: Service
@@ -36,8 +28,9 @@ metadata:
   name: bank-service
   namespace: finether
 spec:
+  selector:
+    app: bank-service
   ports:
     - port: 8002
       targetPort: 8002
-  selector:
-    app: bank-service
+  type: ClusterIP

@@ -30,7 +30,7 @@ def get_id_by_username(username:str):
         return user['user_id']
     except requests.HTTPError:
         raise HTTPException(status_code=404, detail="Unvalid username")
-
+    
 
 def validate_bank_account(account_number: str):
     try:
@@ -60,7 +60,7 @@ def get_all_bank_accounts(db: Session):
 
 
 def get_bank_accounts_by_user(db: Session, user_id: int):
-    return db.query(BankAccount).filter(BankAccount.user_id == user_id).all()
+    return db.query(BankAccount).filter(BankAccount.user_id == user_id).first()
 
 
 
@@ -96,6 +96,7 @@ def deposit_to_receiver(account_number: str, amount: float):
             detail=e.response.json().get("detail", "Error processing deposit")
         )
     
+
 
 def create_user_to_user_transaction(
     db: Session, sender: BankAccount, receiver: BankAccount, amount: float

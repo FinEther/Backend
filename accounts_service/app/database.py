@@ -3,7 +3,6 @@ import sqlalchemy.ext.declarative as _declarative
 import sqlalchemy.orm as _orm
 import os
 
-#bedlou hnaya b password dyalkoum(1234),user (postgres),port(5433),smya d database(projet_ai)
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 engine = _sql.create_engine(DATABASE_URL)
