@@ -2,6 +2,12 @@ pipeline {
     agent any
     environment {
         DOCKER_IMAGE_PREFIX = 'badryb/finether'
+        // Port forwarding configuration
+        USER_SERVICE_PORT = '8001:8001'
+        BANK_SERVICE_PORT = '8002:8002'
+        ACCOUNTS_SERVICE_PORT = '8003:8003'
+        PROMETHEUS_PORT = '9090:9090'
+        GRAFANA_PORT = '3000:3000'
     }
     triggers {
         githubPush()
@@ -132,14 +138,56 @@ pipeline {
                 }
             }
         }
+
+        stage('Setup Port Forwarding') {
+            steps {
+                echo 'Setting up port forwarding for services and monitoring tools...'
+                withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
+                    bat '''
+                        @echo off
+                        
+                        REM Kill existing port-forward processes
+                        FOR /F "tokens=5" %%P IN ('netstat -a -n -o ^| findstr "8001 8002 8003 9090 3000"') DO TaskKill /PID %%P /F /T 2>NUL
+                        
+                        REM Start port forwarding for services
+                        start "User Service Port Forward" cmd /c kubectl port-forward service/user-service %USER_SERVICE_PORT% --kubeconfig=%KUBECONFIG%
+                        start "Bank Service Port Forward" cmd /c kubectl port-forward service/bank-service %BANK_SERVICE_PORT% --kubeconfig=%KUBECONFIG%
+                        start "Accounts Service Port Forward" cmd /c kubectl port-forward service/accounts-service %ACCOUNTS_SERVICE_PORT% --kubeconfig=%KUBECONFIG%
+                        
+                        REM Start port forwarding for monitoring tools
+                        start "Prometheus Port Forward" cmd /c kubectl port-forward service/prometheus-service %PROMETHEUS_PORT% --kubeconfig=%KUBECONFIG%
+                        start "Grafana Port Forward" cmd /c kubectl port-forward service/grafana %GRAFANA_PORT% --kubeconfig=%KUBECONFIG%
+                        
+                        REM Wait a few seconds to ensure port forwarding is established
+                        timeout /t 10 /nobreak
+                        
+                        REM Verify port forwarding
+                        netstat -an | findstr "8001 8002 8003 9090 3000"
+                    '''
+                }
+            }
+        }
     }
 
     post {
         success {
-            echo "Pipeline completed successfully! All services and monitoring stack are deployed."
+            echo '''
+                Pipeline completed successfully! 
+                Services are accessible at:
+                - User Service: http://localhost:8001
+                - Bank Service: http://localhost:8002
+                - Accounts Service: http://localhost:8003
+                Monitoring tools:
+                - Prometheus: http://localhost:9090
+                - Grafana: http://localhost:3000
+            '''
         }
         failure {
             echo "Pipeline failed. Please check the logs for details."
+            bat '''
+                REM Cleanup port forwarding on failure
+                FOR /F "tokens=5" %%P IN ('netstat -a -n -o ^| findstr "8001 8002 8003 9090 3000"') DO TaskKill /PID %%P /F /T 2>NUL
+            '''
         }
         always {
             echo "Pipeline execution completed. Deployment status can be checked in Kubernetes dashboard."
