@@ -145,30 +145,41 @@ pipeline {
         withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
             bat '''
                 @echo off
+                setlocal enabledelayedexpansion
+                
+                REM Ensure no encoding issues
+                chcp 65001 >nul
 
                 REM Kill existing port-forward processes
-                for /f "tokens=5 delims= " %%P in ('netstat -a -n -o ^| findstr "8001 8002 8003 9090 3000"') do (
-                    echo Killing process %%P...
+                echo Killing existing port-forward processes...
+                FOR /F "tokens=5" %%P IN ('netstat -a -n -o ^| findstr "8001 8002 8003 9090 3000"') DO (
+                    echo Terminating process with PID %%P...
                     TaskKill /PID %%P /F /T 2>NUL
                 )
-
+                
                 REM Start port forwarding for services
+                echo Starting port forwarding for services...
                 start "User Service Port Forward" cmd /c kubectl port-forward service/user-service %USER_SERVICE_PORT% --kubeconfig=%KUBECONFIG%
                 start "Bank Service Port Forward" cmd /c kubectl port-forward service/bank-service %BANK_SERVICE_PORT% --kubeconfig=%KUBECONFIG%
                 start "Accounts Service Port Forward" cmd /c kubectl port-forward service/accounts-service %ACCOUNTS_SERVICE_PORT% --kubeconfig=%KUBECONFIG%
-
+                
                 REM Start port forwarding for monitoring tools
+                echo Starting port forwarding for monitoring tools...
                 start "Prometheus Port Forward" cmd /c kubectl port-forward service/prometheus-service %PROMETHEUS_PORT% --kubeconfig=%KUBECONFIG%
                 start "Grafana Port Forward" cmd /c kubectl port-forward service/grafana %GRAFANA_PORT% --kubeconfig=%KUBECONFIG%
-
+                
                 REM Wait a few seconds to ensure port forwarding is established
-                timeout /t 10 /nobreak > NUL
-
+                echo Waiting for port forwarding to establish...
+                timeout /t 10 /nobreak
+                
                 REM Verify port forwarding
+                echo Verifying port forwarding...
                 netstat -an | findstr "8001 8002 8003 9090 3000"
             '''
         }
     }
+}
+
 }
 
     }
