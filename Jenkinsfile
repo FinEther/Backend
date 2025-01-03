@@ -132,21 +132,21 @@ pipeline {
 			steps {
 				echo 'Setting up port forwarding for services and monitoring tools...'
 				withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
-					bat """
-							REM Start port forwarding directly
-								kubectl port-forward service/user-service ${USER_SERVICE_PORT} --kubeconfig=%KUBECONFIG%
-								kubectl port-forward service/bank-service ${BANK_SERVICE_PORT} --kubeconfig=%KUBECONFIG%
-								kubectl port-forward service/accounts-service ${ACCOUNTS_SERVICE_PORT} --kubeconfig=%KUBECONFIG%
-								kubectl port-forward service/prometheus-service ${PROMETHEUS_PORT} --kubeconfig=%KUBECONFIG%
-								kubectl port-forward service/grafana ${GRAFANA_PORT} --kubeconfig=%KUBECONFIG%
-							
-							REM Wait briefly for ports to establish
-							timeout /t 5 /nobreak
+					powershell """
+						# Start port forwarding for each service
+						Start-Process kubectl -ArgumentList "port-forward service/user-service ${USER_SERVICE_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
+						Start-Process kubectl -ArgumentList "port-forward service/bank-service ${BANK_SERVICE_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
+						Start-Process kubectl -ArgumentList "port-forward service/accounts-service ${ACCOUNTS_SERVICE_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
+						Start-Process kubectl -ArgumentList "port-forward service/prometheus-service ${PROMETHEUS_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
+						Start-Process kubectl -ArgumentList "port-forward service/grafana ${GRAFANA_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
+						
+						# Wait for a few seconds to let the ports establish
+						Start-Sleep -Seconds 5
 					"""
 				}
 			}
-    	}
-	}
+		}
+    }
 
     post {
         success {
