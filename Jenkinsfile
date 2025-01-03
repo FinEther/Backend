@@ -139,7 +139,8 @@ pipeline {
             }
         }
 
-        stage('Setup Port Forwarding') {
+        
+		stage('Setup Port Forwarding') {
     steps {
         echo 'Setting up port forwarding for services and monitoring tools...'
         withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
@@ -180,7 +181,6 @@ pipeline {
     }
 }
 
-}
 
     }
 
