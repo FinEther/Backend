@@ -133,17 +133,15 @@ pipeline {
 				echo 'Setting up port forwarding for services and monitoring tools...'
 				withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
 					bat """
-						@echo off
-						
-						REM Start port forwarding directly
-						start /B kubectl port-forward service/user-service ${USER_SERVICE_PORT} --kubeconfig=%KUBECONFIG%
-						start /B kubectl port-forward service/bank-service ${BANK_SERVICE_PORT} --kubeconfig=%KUBECONFIG%
-						start /B kubectl port-forward service/accounts-service ${ACCOUNTS_SERVICE_PORT} --kubeconfig=%KUBECONFIG%
-						start /B kubectl port-forward service/prometheus-service ${PROMETHEUS_PORT} --kubeconfig=%KUBECONFIG%
-						start /B kubectl port-forward service/grafana ${GRAFANA_PORT} --kubeconfig=%KUBECONFIG%
-						
-						REM Wait briefly for ports to establish
-						timeout /t 5 /nobreak
+							REM Start port forwarding directly
+								kubectl port-forward service/user-service ${USER_SERVICE_PORT} --kubeconfig=%KUBECONFIG%
+								kubectl port-forward service/bank-service ${BANK_SERVICE_PORT} --kubeconfig=%KUBECONFIG%
+								kubectl port-forward service/accounts-service ${ACCOUNTS_SERVICE_PORT} --kubeconfig=%KUBECONFIG%
+								kubectl port-forward service/prometheus-service ${PROMETHEUS_PORT} --kubeconfig=%KUBECONFIG%
+								kubectl port-forward service/grafana ${GRAFANA_PORT} --kubeconfig=%KUBECONFIG%
+							
+							REM Wait briefly for ports to establish
+							timeout /t 5 /nobreak
 					"""
 				}
 			}
