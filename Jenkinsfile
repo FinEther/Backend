@@ -24,19 +24,19 @@ pipeline {
                 stage('Build User Service Image') {
                     steps {
                         echo 'Building Docker image for user-service...'
-                        bat 'docker build -t %DOCKER_IMAGE_PREFIX%-user-service -f user_service/Dockerfile ./user_service'
+                        bat "docker build -t ${DOCKER_IMAGE_PREFIX}-user-service -f user_service/Dockerfile ./user_service"
                     }
                 }
                 stage('Build Bank Service Image') {
                     steps {
                         echo 'Building Docker image for bank-service...'
-                        bat 'docker build -t %DOCKER_IMAGE_PREFIX%-bank-service -f bank_service/Dockerfile ./bank_service'
+                        bat "docker build -t ${DOCKER_IMAGE_PREFIX}-bank-service -f bank_service/Dockerfile ./bank_service"
                     }
                 }
                 stage('Build Accounts Service Image') {
                     steps {
                         echo 'Building Docker image for accounts-service...'
-                        bat 'docker build -t %DOCKER_IMAGE_PREFIX%-accounts-service -f accounts_service/Dockerfile ./accounts_service'
+                        bat "docker build -t ${DOCKER_IMAGE_PREFIX}-accounts-service -f accounts_service/Dockerfile ./accounts_service"
                     }
                 }
             }
@@ -47,30 +47,30 @@ pipeline {
                 stage('Push User Service Image') {
                     steps {
                         withCredentials([usernamePassword(credentialsId: 'DockerHub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                            bat '''
+                            bat """
                                 docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%
-                                docker push %DOCKER_IMAGE_PREFIX%-user-service
-                            '''
+                                docker push ${DOCKER_IMAGE_PREFIX}-user-service
+                            """
                         }
                     }
                 }
                 stage('Push Bank Service Image') {
                     steps {
                         withCredentials([usernamePassword(credentialsId: 'DockerHub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                            bat '''
+                            bat """
                                 docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%
-                                docker push %DOCKER_IMAGE_PREFIX%-bank-service
-                            '''
+                                docker push ${DOCKER_IMAGE_PREFIX}-bank-service
+                            """
                         }
                     }
                 }
                 stage('Push Accounts Service Image') {
                     steps {
                         withCredentials([usernamePassword(credentialsId: 'DockerHub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                            bat '''
+                            bat """
                                 docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%
-                                docker push %DOCKER_IMAGE_PREFIX%-accounts-service
-                            '''
+                                docker push ${DOCKER_IMAGE_PREFIX}-accounts-service
+                            """
                         }
                     }
                 }
@@ -81,14 +81,14 @@ pipeline {
             steps {
                 echo 'Deploying monitoring stack...'
                 withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
-                    bat '''
+                    bat """
                         kubectl apply -f monitoring/prometheus/prometheus-configmap.yaml --kubeconfig=%KUBECONFIG%
                         kubectl apply -f monitoring/prometheus/prometheus-rbac.yaml --kubeconfig=%KUBECONFIG%
                         kubectl apply -f monitoring/prometheus/node-exporter.yaml --kubeconfig=%KUBECONFIG%
                         kubectl apply -f monitoring/prometheus/kube-state-metrics.yaml --kubeconfig=%KUBECONFIG%
                         kubectl apply -f monitoring/prometheus/prometheus-deployment.yaml --kubeconfig=%KUBECONFIG%
                         kubectl apply -f monitoring/grafana/grafana-deployment.yaml --kubeconfig=%KUBECONFIG%
-                    '''
+                    """
                 }
             }
         }
@@ -98,42 +98,35 @@ pipeline {
                 stage('Deploy User Service Stack') {
                     steps {
                         withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
-                            bat '''
+                            bat """
                                 kubectl apply -f user_service/k8s/db-users.yaml --kubeconfig=%KUBECONFIG%
                                 kubectl apply -f user_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG%
-                            '''
+                                kubectl rollout status deployment/user-service --kubeconfig=%KUBECONFIG%
+                            """
                         }
                     }
                 }
                 stage('Deploy Bank Service Stack') {
                     steps {
                         withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
-                            bat '''
+                            bat """
                                 kubectl apply -f bank_service/k8s/db-bank.yaml --kubeconfig=%KUBECONFIG%
                                 kubectl apply -f bank_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG%
-                            '''
+                                kubectl rollout status deployment/bank-service --kubeconfig=%KUBECONFIG%
+                            """
                         }
                     }
                 }
                 stage('Deploy Accounts Service Stack') {
                     steps {
                         withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
-                            bat '''
+                            bat """
                                 kubectl apply -f accounts_service/k8s/db-accounts.yaml --kubeconfig=%KUBECONFIG%
                                 kubectl apply -f accounts_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG%
-                            '''
+                                kubectl rollout status deployment/accounts-service --kubeconfig=%KUBECONFIG%
+                            """
                         }
                     }
-                }
-            }
-        }
-
-        stage('Verify Deployments') {
-            steps {
-                withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
-                    bat '''
-                        kubectl get pods --kubeconfig=%KUBECONFIG%
-                    '''
                 }
             }
         }
@@ -142,35 +135,30 @@ pipeline {
             steps {
                 echo 'Setting up port forwarding for services and monitoring tools...'
                 withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
-                    bat '''
+                    bat """
                         @echo off
-                        setlocal enabledelayedexpansion
-                        chcp 65001 >nul
-
+                        
                         REM Kill existing port-forward processes
-                        echo Killing existing processes...
-                        FOR /F "tokens=5" %%P IN ('netstat -a -n -o ^| findstr "8001 8002 8003 9090 3000"') DO (
-                            TaskKill /PID %%P /F /T 2>NUL
+                        FOR /F "tokens=5" %%P IN ('netstat -ano ^| findstr ":8001 :8002 :8003 :9090 :3000"') DO (
+                            taskkill /F /PID %%P 2>NUL
                         )
-
-                        REM Port forwarding for services
-                        echo Forwarding services...
-                        start cmd /c kubectl port-forward service/user-service %USER_SERVICE_PORT% --kubeconfig=%KUBECONFIG%
-                        start cmd /c kubectl port-forward service/bank-service %BANK_SERVICE_PORT% --kubeconfig=%KUBECONFIG%
-                        start cmd /c kubectl port-forward service/accounts-service %ACCOUNTS_SERVICE_PORT% --kubeconfig=%KUBECONFIG%
-
-                        REM Port forwarding for monitoring tools
-                        echo Forwarding monitoring tools...
-                        start cmd /c kubectl port-forward service/prometheus-service %PROMETHEUS_PORT% --kubeconfig=%KUBECONFIG%
-                        start cmd /c kubectl port-forward service/grafana %GRAFANA_PORT% --kubeconfig=%KUBECONFIG%
-
-                        REM Wait to stabilize
+                        
+                        REM Wait for processes to be killed
+                        timeout /t 5 /nobreak
+                        
+                        REM Start port forwarding in separate processes
+                        start /B kubectl port-forward service/user-service ${USER_SERVICE_PORT} --kubeconfig=%KUBECONFIG%
+                        start /B kubectl port-forward service/bank-service ${BANK_SERVICE_PORT} --kubeconfig=%KUBECONFIG%
+                        start /B kubectl port-forward service/accounts-service ${ACCOUNTS_SERVICE_PORT} --kubeconfig=%KUBECONFIG%
+                        start /B kubectl port-forward service/prometheus-service ${PROMETHEUS_PORT} --kubeconfig=%KUBECONFIG%
+                        start /B kubectl port-forward service/grafana ${GRAFANA_PORT} --kubeconfig=%KUBECONFIG%
+                        
+                        REM Wait for port forwarding to establish
                         timeout /t 10 /nobreak
-
-                        REM Verify
-                        netstat -an | findstr "8001 8002 8003 9090 3000"
-                        IF ERRORLEVEL 1 exit /b 1
-                    '''
+                        
+                        REM Verify ports are listening
+                        netstat -ano | findstr ":8001 :8002 :8003 :9090 :3000"
+                    """
                 }
             }
         }
@@ -181,9 +169,9 @@ pipeline {
             echo '''
                 Pipeline completed successfully!
                 Services are accessible:
-                - User: http://localhost:8001
-                - Bank: http://localhost:8002
-                - Accounts: http://localhost:8003
+                - User Service: http://localhost:8001
+                - Bank Service: http://localhost:8002
+                - Accounts Service: http://localhost:8003
                 Monitoring:
                 - Prometheus: http://localhost:9090
                 - Grafana: http://localhost:3000
@@ -192,8 +180,8 @@ pipeline {
         failure {
             echo 'Pipeline failed. Cleaning up processes...'
             bat '''
-                FOR /F "tokens=5" %%P IN ('netstat -a -n -o ^| findstr "8001 8002 8003 9090 3000"') DO (
-                    TaskKill /PID %%P /F /T 2>NUL
+                FOR /F "tokens=5" %%P IN ('netstat -ano ^| findstr ":8001 :8002 :8003 :9090 :3000"') DO (
+                    taskkill /F /PID %%P 2>NUL
                 )
             '''
         }
