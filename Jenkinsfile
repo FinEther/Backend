@@ -133,7 +133,7 @@ pipeline {
 				echo 'Setting up port forwarding for services and monitoring tools...'
 				withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
 					powershell """
-			
+		
 						# Start port forwarding for each service
 						Start-Process kubectl -ArgumentList "port-forward -n finether service/user-service ${USER_SERVICE_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
 						Start-Process kubectl -ArgumentList "port-forward -n finether service/bank-service ${BANK_SERVICE_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
