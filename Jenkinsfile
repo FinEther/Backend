@@ -146,9 +146,6 @@ pipeline {
                     bat '''
                         @echo off
                         
-                        REM Kill existing port-forward processes
-                        FOR /F "tokens=5" %%P IN ('netstat -a -n -o ^| findstr "8001 8002 8003 9090 3000"') DO TaskKill /PID %%P /F /T 2>NUL
-                        
                         REM Start port forwarding for services
                         start "User Service Port Forward" cmd /c kubectl port-forward service/user-service %USER_SERVICE_PORT% --kubeconfig=%KUBECONFIG%
                         start "Bank Service Port Forward" cmd /c kubectl port-forward service/bank-service %BANK_SERVICE_PORT% --kubeconfig=%KUBECONFIG%
