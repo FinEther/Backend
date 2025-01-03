@@ -86,7 +86,7 @@ pipeline {
                         withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
                             bat '''
                                 kubectl apply -f user_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG% 
-                                kubectl apply -f user_service/k8s/db-user.yaml --kubeconfig=%KUBECONFIG%
+                                kubectl apply -f user_service/k8s/db-users.yaml --kubeconfig=%KUBECONFIG%
                             '''
                         }
                     }
