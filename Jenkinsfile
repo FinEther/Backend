@@ -101,7 +101,6 @@ pipeline {
                             bat """
                                 kubectl apply -f user_service/k8s/db-users.yaml --kubeconfig=%KUBECONFIG%
                                 kubectl apply -f user_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG%
-                                kubectl rollout status deployment/user-service --kubeconfig=%KUBECONFIG%
                             """
                         }
                     }
@@ -112,7 +111,6 @@ pipeline {
                             bat """
                                 kubectl apply -f bank_service/k8s/db-bank.yaml --kubeconfig=%KUBECONFIG%
                                 kubectl apply -f bank_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG%
-                                kubectl rollout status deployment/bank-service --kubeconfig=%KUBECONFIG%
                             """
                         }
                     }
@@ -123,7 +121,6 @@ pipeline {
                             bat """
                                 kubectl apply -f accounts_service/k8s/db-accounts.yaml --kubeconfig=%KUBECONFIG%
                                 kubectl apply -f accounts_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG%
-                                kubectl rollout status deployment/accounts-service --kubeconfig=%KUBECONFIG%
                             """
                         }
                     }
