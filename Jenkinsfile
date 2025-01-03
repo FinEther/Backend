@@ -129,37 +129,26 @@ pipeline {
         }
 
         stage('Setup Port Forwarding') {
-            steps {
-                echo 'Setting up port forwarding for services and monitoring tools...'
-                withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
-                    bat """
-                        @echo off
-                        
-                        REM Kill existing port-forward processes
-                        FOR /F "tokens=5" %%P IN ('netstat -ano ^| findstr ":8001 :8002 :8003 :9090 :3000"') DO (
-                            taskkill /F /PID %%P 2>NUL
-                        )
-                        
-                        REM Wait for processes to be killed
-                        timeout /t 5 /nobreak
-                        
-                        REM Start port forwarding in separate processes
-                        start /B kubectl port-forward service/user-service ${USER_SERVICE_PORT} --kubeconfig=%KUBECONFIG%
-                        start /B kubectl port-forward service/bank-service ${BANK_SERVICE_PORT} --kubeconfig=%KUBECONFIG%
-                        start /B kubectl port-forward service/accounts-service ${ACCOUNTS_SERVICE_PORT} --kubeconfig=%KUBECONFIG%
-                        start /B kubectl port-forward service/prometheus-service ${PROMETHEUS_PORT} --kubeconfig=%KUBECONFIG%
-                        start /B kubectl port-forward service/grafana ${GRAFANA_PORT} --kubeconfig=%KUBECONFIG%
-                        
-                        REM Wait for port forwarding to establish
-                        timeout /t 10 /nobreak
-                        
-                        REM Verify ports are listening
-                        netstat -ano | findstr ":8001 :8002 :8003 :9090 :3000"
-                    """
-                }
-            }
-        }
-    }
+			steps {
+				echo 'Setting up port forwarding for services and monitoring tools...'
+				withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
+					bat """
+						@echo off
+						
+						REM Start port forwarding directly
+						start /B kubectl port-forward service/user-service ${USER_SERVICE_PORT} --kubeconfig=%KUBECONFIG%
+						start /B kubectl port-forward service/bank-service ${BANK_SERVICE_PORT} --kubeconfig=%KUBECONFIG%
+						start /B kubectl port-forward service/accounts-service ${ACCOUNTS_SERVICE_PORT} --kubeconfig=%KUBECONFIG%
+						start /B kubectl port-forward service/prometheus-service ${PROMETHEUS_PORT} --kubeconfig=%KUBECONFIG%
+						start /B kubectl port-forward service/grafana ${GRAFANA_PORT} --kubeconfig=%KUBECONFIG%
+						
+						REM Wait briefly for ports to establish
+						timeout /t 5 /nobreak
+					"""
+				}
+			}
+    	}
+	}
 
     post {
         success {
@@ -175,12 +164,7 @@ pipeline {
             '''
         }
         failure {
-            echo 'Pipeline failed. Cleaning up processes...'
-            bat '''
-                FOR /F "tokens=5" %%P IN ('netstat -ano ^| findstr ":8001 :8002 :8003 :9090 :3000"') DO (
-                    taskkill /F /PID %%P 2>NUL
-                )
-            '''
+            echo 'Pipeline failed.'
         }
         always {
             echo 'Pipeline completed. Verify services via the Kubernetes dashboard.'
