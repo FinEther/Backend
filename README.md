@@ -28,6 +28,8 @@ This application utilizes cutting-edge technologies to deliver high-performance 
 - REST API and Kafka for communication between microservices.
 - Comprehensive monitoring and security measures.
 
+![Architecture Diagram](../Architecture.png "System Architecture")
+
 ---
 
 ## Tech Stack
@@ -46,7 +48,7 @@ This application utilizes cutting-edge technologies to deliver high-performance 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo.git
+   git clone https://github.com/FinEther/Backend.git
    cd fintech-app
    ```
 2. Configure the `.env` files for each microservice with the required environment variables.
@@ -122,14 +124,14 @@ The application supports:
 
    - Uses Docker Compose for local testing.
 
-2. **Cloud Deployment:**
-   - Kubernetes clusters managed on cloud providers (AWS, GCP, or Azure).
+2. **Kubernetes Deployment:**
+   - Kubernetes cluster managed with kubectl & K9S.
 
 ---
 
 ## Contributors
 
+- **Backend Developer:** AFROUKH Abdellah
 - **DevOps Engineer:** BAY BAY Badr
-- **Backend Developers:** AFROUKH Abdellah
 - **Blockchain & Web3:** MOUTMAINE Aymane
 - **UI/UX Designer:** SENBATI Nizar
