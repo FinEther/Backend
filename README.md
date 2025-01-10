@@ -28,9 +28,7 @@ This application utilizes cutting-edge technologies to deliver high-performance 
 - REST API and Kafka for communication between microservices.
 - Comprehensive monitoring and security measures.
 
-![Architecture Diagram](../Architecture.png "System Architecture")
-
----
+## ![Architecture Diagram](../Architecture.png "System Architecture")
 
 ## Tech Stack
 
