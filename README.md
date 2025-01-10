@@ -32,10 +32,9 @@ This application utilizes cutting-edge technologies to deliver high-performance 
 
 ## Tech Stack
 
-- **Programming Languages:** Python, FastAPI, Flask.
-- **Frontend:** React or any preferred framework.
+- **Programming Languages:** Python, FastAPI.
+- **Frontend:** Angular TS.
 - **DevOps Tools:** Docker, Kubernetes, Jenkins, Minikube, k9s.
-- **Message Broker:** Apache Kafka.
 - **Database:** PostgreSQL for each microservice.
 - **Blockchain:** Sepolia Ethereum testnet integrated with Metamask.
 - **Monitoring:** Prometheus and Grafana.
@@ -56,7 +55,7 @@ This application utilizes cutting-edge technologies to deliver high-performance 
    ```
 4. Deploy services on Kubernetes:
    ```bash
-   kubectl apply -f k8s/
+   kubectl apply -f <service-name>/k8s/
    ```
 5. Access the frontend at `http://localhost:<frontend-port>`.
 
@@ -76,7 +75,6 @@ The application consists of the following services:
 **Communication:**
 
 - **REST APIs:** Synchronous communication.
-- **Kafka:** Asynchronous messaging between microservices.
 
 **Database Design:**
 
@@ -123,6 +121,7 @@ The application supports:
    - Uses Docker Compose for local testing.
 
 2. **Kubernetes Deployment:**
+
    - Kubernetes cluster managed with kubectl & K9S.
 
 ---
