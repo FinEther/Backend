@@ -129,6 +129,7 @@ The application supports:
 
 ## Contributors
 
-- **DevOps Engineer:** Your Name
-- **Backend Developers:** Team Members
-- **UI/UX Designers:** Team Members
+- **DevOps Engineer:** BAY BAY Badr
+- **Backend Developers:** AFROUKH Abdellah
+- **Blockchain & Web3:** MOUTMAINE Aymane
+- **UI/UX Designer:** SENBATI Nizar
