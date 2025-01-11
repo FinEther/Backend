@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: accounts-service
-          image: badryb/finether-accounts-service:v3
+          image: badryb/finether-accounts-service:latest
           ports:
             - containerPort: 8003
           env:

@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: user-service
-          image: badryb/finether-user-service:v3
+          image: badryb/finether-user-service:latest
           ports:
             - containerPort: 8001
           env:

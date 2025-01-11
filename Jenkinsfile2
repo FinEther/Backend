@@ -5,9 +5,6 @@ pipeline {
         USER_SERVICE_PORT = '8001:8001'
         BANK_SERVICE_PORT = '8002:8002'
         ACCOUNTS_SERVICE_PORT = '8003:8003'
-        NOTIFICATION_SERVICE_PORT = '8004:8004'
-        FRONTEND_PORT = '4200:80'
-        BLOCKCHAIN_SERVICE_PORT = '8501:8501'
         PROMETHEUS_PORT = '9090:9090'
         GRAFANA_PORT = '3000:3000'
     }
@@ -42,19 +39,6 @@ pipeline {
                         bat "docker build -t ${DOCKER_IMAGE_PREFIX}-accounts-service -f accounts_service/Dockerfile ./accounts_service"
                     }
                 }
-                stage('Build Notification Service Image') {
-                    steps {
-                        echo 'Building Docker image for notification-service...'
-                        bat "docker build -t ${DOCKER_IMAGE_PREFIX}-notification-service -f notification_service/Dockerfile ./notification_service"
-                    }
-                }
-                
-                stage('Build Frontend Image') {
-                    steps {
-                        echo 'Building Docker image for frontend...'
-                        bat "docker build -t ${DOCKER_IMAGE_PREFIX}-frontend -f Fintech_Front-End-main/Dockerfile ./Fintech_Front-End-main"
-                    }
-                }
             }
         }
 
@@ -86,27 +70,6 @@ pipeline {
                             bat """
                                 docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%
                                 docker push ${DOCKER_IMAGE_PREFIX}-accounts-service
-                            """
-                        }
-                    }
-                }
-                stage('Push Notification Service Image') {
-                    steps {
-                        withCredentials([usernamePassword(credentialsId: 'DockerHub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                            bat """
-                                docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%
-                                docker push ${DOCKER_IMAGE_PREFIX}-notification-service
-                            """
-                        }
-                    }
-                }
-                
-                stage('Push Frontend Image') {
-                    steps {
-                        withCredentials([usernamePassword(credentialsId: 'DockerHub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                            bat """
-                                docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%
-                                docker push ${DOCKER_IMAGE_PREFIX}-frontend
                             """
                         }
                     }
@@ -162,55 +125,28 @@ pipeline {
                         }
                     }
                 }
-                stage('Deploy Notification Service Stack') {
-                    steps {
-                        withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
-                            bat """
-                                kubectl apply -f notification_service/k8s/db-notifications.yaml --kubeconfig=%KUBECONFIG%
-                                kubectl apply -f notification_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG%
-                            """
-                        }
-                    }
-                }
-                stage('Deploy Blockchain Service Stack') {
-                    steps {
-                        withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
-                            bat """
-                                kubectl apply -f blockchain_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG%
-                            """
-                        }
-                    }
-                }
-                stage('Deploy Frontend Stack') {
-                    steps {
-                        withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
-                            bat """
-                                kubectl apply -f Fintech_Front-End-main/k8s/deployment.yml --kubeconfig=%KUBECONFIG%
-                            """
-                        }
-                    }
-                }
             }
         }
 
         stage('Setup Port Forwarding') {
-            steps {
-                echo 'Setting up port forwarding for services and monitoring tools...'
-                withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
-                    powershell """
-                        Start-Process kubectl -ArgumentList "port-forward -n finether service/user-service ${USER_SERVICE_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
-                        Start-Process kubectl -ArgumentList "port-forward -n finether service/bank-service ${BANK_SERVICE_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
-                        Start-Process kubectl -ArgumentList "port-forward -n finether service/accounts-service ${ACCOUNTS_SERVICE_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
-                        Start-Process kubectl -ArgumentList "port-forward -n finether service/notification-service ${NOTIFICATION_SERVICE_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
-                        Start-Process kubectl -ArgumentList "port-forward -n finether service/blockchain-service ${BLOCKCHAIN_SERVICE_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
-                        Start-Process kubectl -ArgumentList "port-forward -n finether service/frontend ${FRONTEND_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
-                        Start-Process kubectl -ArgumentList "port-forward -n finether service/prometheus-service ${PROMETHEUS_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
-                        Start-Process kubectl -ArgumentList "port-forward -n finether service/grafana ${GRAFANA_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
-                        Start-Sleep -Seconds 5
-                    """
-                }
-            }
-        }
+			steps {
+				echo 'Setting up port forwarding for services and monitoring tools...'
+				withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
+					powershell """
+		
+						# Start port forwarding for each service
+						Start-Process kubectl -ArgumentList "port-forward -n finether service/user-service ${USER_SERVICE_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
+						Start-Process kubectl -ArgumentList "port-forward -n finether service/bank-service ${BANK_SERVICE_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
+						Start-Process kubectl -ArgumentList "port-forward -n finether service/accounts-service ${ACCOUNTS_SERVICE_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
+						Start-Process kubectl -ArgumentList "port-forward -n finether service/prometheus-service ${PROMETHEUS_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
+						Start-Process kubectl -ArgumentList "port-forward -n finether service/grafana ${GRAFANA_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
+						
+						# Wait for a few seconds to let the ports establish
+						Start-Sleep -Seconds 5
+					"""
+				}
+			}
+		}
     }
 
     post {
@@ -221,9 +157,6 @@ pipeline {
                 - User Service: http://localhost:8001
                 - Bank Service: http://localhost:8002
                 - Accounts Service: http://localhost:8003
-                - Notification Service: http://localhost:8004
-                - Blockchain Service: http://localhost:8501
-                - Frontend: http://localhost:4200
                 Monitoring:
                 - Prometheus: http://localhost:9090
                 - Grafana: http://localhost:3000
