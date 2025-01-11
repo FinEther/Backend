@@ -188,15 +188,7 @@ pipeline {
                         }
                     }
                 }
-                stage('Deploy Blockchain Service Stack') {
-                    steps {
-                        withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
-                            bat """
-                                kubectl apply -f blockchain_service/k8s/deployment.yml --kubeconfig=%KUBECONFIG%
-                            """
-                        }
-                    }
-                }
+                
                 stage('Deploy Frontend Stack') {
                     steps {
                         withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
@@ -218,7 +210,6 @@ pipeline {
                         Start-Process kubectl -ArgumentList "port-forward -n finether service/bank-service ${BANK_SERVICE_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
                         Start-Process kubectl -ArgumentList "port-forward -n finether service/accounts-service ${ACCOUNTS_SERVICE_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
                         Start-Process kubectl -ArgumentList "port-forward -n finether service/notification-service ${NOTIFICATION_SERVICE_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
-                        Start-Process kubectl -ArgumentList "port-forward -n finether service/blockchain-service ${BLOCKCHAIN_SERVICE_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
                         Start-Process kubectl -ArgumentList "port-forward -n finether service/frontend ${FRONTEND_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
                         Start-Process kubectl -ArgumentList "port-forward -n finether service/prometheus-service ${PROMETHEUS_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
                         Start-Process kubectl -ArgumentList "port-forward -n finether service/grafana ${GRAFANA_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
