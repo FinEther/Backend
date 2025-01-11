@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: bank-service
-          image: badryb/finether-bank-service:latest
+          image: badryb/finether-bank-service:v3
           ports:
             - containerPort: 8002
           env:
