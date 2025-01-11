@@ -198,23 +198,14 @@ pipeline {
                         }
                     }
                 }
-            }
-        }
-
-        stage('Setup Port Forwarding') {
-            steps {
-                echo 'Setting up port forwarding for services and monitoring tools...'
-                withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
-                    powershell """
-                        Start-Process kubectl -ArgumentList "port-forward -n finether service/user-service ${USER_SERVICE_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
-                        Start-Process kubectl -ArgumentList "port-forward -n finether service/bank-service ${BANK_SERVICE_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
-                        Start-Process kubectl -ArgumentList "port-forward -n finether service/accounts-service ${ACCOUNTS_SERVICE_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
-                        Start-Process kubectl -ArgumentList "port-forward -n finether service/notification-service ${NOTIFICATION_SERVICE_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
-                        Start-Process kubectl -ArgumentList "port-forward -n finether service/frontend ${FRONTEND_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
-                        Start-Process kubectl -ArgumentList "port-forward -n finether service/prometheus-service ${PROMETHEUS_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
-                        Start-Process kubectl -ArgumentList "port-forward -n finether service/grafana ${GRAFANA_PORT} --kubeconfig=${KUBECONFIG}" -WindowStyle Hidden
-                        Start-Sleep -Seconds 5
-                    """
+                stage('Deploy Frontend Stack') {
+                    steps {
+                        withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
+                            bat """
+                                kubectl apply -f gateway/k8s/deployment.yml --kubeconfig=%KUBECONFIG%
+                            """
+                        }
+                    }
                 }
             }
         }
