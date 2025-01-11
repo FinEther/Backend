@@ -1,0 +1,17 @@
+
+
+<div class="container" *ngIf="!this.authService.isLoggedIn()">
+  <router-outlet></router-outlet>
+</div>
+
+<div class="container" *ngIf="this.authService.isLoggedIn()">
+    <nav><app-side-bar></app-side-bar></nav>
+    <div class="right">
+      <div class="top"><app-top-bar></app-top-bar></div>
+      <main>
+        <div class="contenut">
+          <router-outlet></router-outlet>
+        </div>
+      </main>
+    </div>
+</div>

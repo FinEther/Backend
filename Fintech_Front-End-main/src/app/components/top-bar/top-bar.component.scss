@@ -1,0 +1,34 @@
+@mixin horizental {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    font-weight: 600;
+}
+
+.container{
+    width: 100%;
+    height: 100%;
+    @include horizental();
+    border: 1px black solid;
+    padding: 0px 0.5rem 0px 1rem;
+    background-color: white;
+}
+
+.user{
+    display: inline-block;
+    margin-left: auto;
+    @include horizental();
+
+    .notification{
+        margin-right: 1rem;
+    }
+    .usericon{
+        margin-left: 0.5rem;
+    }
+}
+
+.currpage{
+    display: inline-block;
+    font-size: 2rem;
+}

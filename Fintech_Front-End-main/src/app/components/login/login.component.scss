@@ -1,0 +1,104 @@
+.all{
+    height: 100%;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: url("../../../assets/blue-background.jpg");
+    background-repeat: no-repeat;
+    position: center;
+    background-size: cover;
+}
+
+.buble{
+    height: 64vh;
+    width: 40vw;
+    border: 2px solid rgba(255, 255, 255, .2);
+    backdrop-filter: blur(20px);
+    background-color: transparent;
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+    color: aliceblue;
+    img{
+        width: 80px;
+        height: 80px;
+    }
+    .header{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 1.5rem 0rem 0rem 0rem;
+        .titre{
+            font-size: 1.4rem;
+        }
+    }
+    form{
+        margin: 1rem 2rem;
+        box-sizing: border-box;
+        label{
+            display: block;
+            align-self: flex-start;
+        }
+        input{
+            box-sizing: border-box;
+            border: 1px solid aliceblue;
+            width: 100%;
+            height: 2rem;
+            border-radius: 10px;
+            padding: 0 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .oublier{
+            width: 100%;
+            text-align: end;
+            text-decoration: underline;
+            margin-bottom: 1rem;
+        }
+    }
+    .validation{
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content: space-between;
+        .metamask{
+            display: inline-block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            padding-right: 5px;
+            &:hover{
+                background-color: rgba(1, 23, 113, 0.2);
+                cursor: pointer;
+            }
+            .logometa{
+                width: 50px;
+                height: 50px;
+            }
+        }
+        button{
+            width: 15vw;
+            height: 2rem;
+            border-radius: 10px;
+            border: 1px solid aliceblue;
+            cursor: pointer;
+            &:hover{
+                background-color: rgb(220, 239, 255);
+                cursor: pointer;
+            }
+            &:active{
+                background-color: rgb(173, 214, 250);
+            }
+        }
+    }
+    .new{
+        width: 100%;
+        text-align: center;
+        margin-top: 0.5rem;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+    
+}

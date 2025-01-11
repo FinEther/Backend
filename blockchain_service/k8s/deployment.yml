@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blockchain-service
+  namespace: finether
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blockchain-service
+  template:
+    metadata:
+      labels:
+        app: blockchain-service
+    spec:
+      containers:
+        - name: blockchain-service
+          image: badryb/finether-blockchain-service:v1
+          ports:
+            - containerPort: 8006
+          env:
+            - name: DATABASE_URL
+              value: postgresql://postgres:1234@blockchain-db-service:5432/projet_python_blockchain
+            - name: NOTIFICATION_URL
+              value: http://notification-service:8004
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: blockchain-service
+  namespace: finether
+spec:
+  selector:
+    app: blockchain-service
+  ports:
+    - port: 8006
+      targetPort: 8006
+  type: ClusterIP

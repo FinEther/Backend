@@ -1,0 +1,144 @@
+.page{
+    width: 100vw;
+    height: 100%;
+    display: flex;
+    background: url("../../../assets/blue-background.jpg");
+    background-repeat: no-repeat;
+    position: center;
+    background-size: cover;
+    background-attachment: fixed;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+.sideErea{
+    width: 60vw;
+    height: 100vh;
+    display: flex;
+    .description{
+        color: aliceblue;
+        align-self: flex-end;
+        margin: 0px 0px 5rem 5rem;
+        .titre{
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        position: fixed;
+    }
+}
+
+.component{
+    width: 40vw;
+    height: fit-content;
+    backdrop-filter: blur(30px);
+    background-color: transparent;
+}
+
+.title{
+    height: 35vh;
+    width: 100%;
+    display: flex;
+    margin-bottom: 5vh;
+    font-size: 2rem;
+    padding: 0 3rem;
+    .text{
+        width: fit-content;
+        margin-top: auto;
+        align-self: flex-end;
+        font-size: 3rem;
+        color: aliceblue;
+    }
+}
+
+form{
+    width: 100%;
+    display: flex;
+    box-sizing: border-box;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0 3rem;
+    margin-bottom: 3rem;
+    color: aliceblue;
+    input, select{
+        display: block;
+    }
+    input[type=text], input[type=email], input[type=number], input[type=password], select{
+        height: 3rem;
+        width: 100%;
+        border: none;
+        margin-bottom: 1rem;
+        text-indent: 10px;
+        background-color: rgba(255, 255, 255, .2);
+    }
+    label{
+        font-size: 0.8rem;
+        margin-bottom: 0.5rem;
+        margin-top: 1rem;
+    }
+    .titre{
+        font-size: 1.1rem;
+        margin: 1rem 0;
+    }
+    input[type="checkbox"]{
+        display: inline-block;
+        margin: 1rem 1rem 0rem 1rem;
+    }
+    button{
+        width: 100%;
+        height: 3rem;
+        background-color: #1e90ff;
+        color: #f0f8ff;
+        border: none;
+        cursor: pointer;
+        margin-top: 1rem;
+        &:hover{
+            background-color: #1976d2;
+        }
+        &:active{
+            background-color: #0f4173;
+        }
+    }
+    button[type="reset"]{
+        background-color: #0f4173;
+        &:hover{
+            background-color: #1a4875;
+        }
+        &:active{
+            background-color: #2e5173;
+        }
+    }
+
+    .date{
+        color: aliceblue;
+        border: 2px aliceblue solid;
+    }
+
+    .metamask{
+        background-color: rgba(1, 23, 113, 0.4);
+        display: inline-block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        padding-right: 5px;
+        &:hover{
+            background-color: rgba(1, 23, 113, 0.6);
+            cursor: pointer;
+        }
+        .logometa{
+            width: 50px;
+            height: 50px;
+        }
+    }
+    .msgErr{
+        display: block;
+        color: red;
+        font-size: 0.8rem;
+    }
+}
+.nonValid{
+    border: 2px solid red;
+}

@@ -1,0 +1,79 @@
+@mixin format{
+    background-color: aliceblue;
+    border-radius: 20px;
+    padding: 1rem;
+}
+
+.component{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.section1{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.section2{
+    width: 100%;
+    height: 40vh;
+    padding: 1rem 0px;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    .graph1{
+        height: 100%;
+        width: 45%;
+    }
+    .graph2{
+        height: 100%;
+        width: 45%;
+    }
+}
+
+.title{
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin: 1rem 0px;
+}
+
+.composant{
+    @include format();
+    width: 15vw;
+    height: 15vh;
+    &:first-child{
+        margin-right: 1rem;
+    }
+    .details{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1.3rem;
+        .text{
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+    }
+}
+
+.carte{
+    @include format();
+    background-image: linear-gradient(to right, aliceblue, #064494);
+    width: 30vw;
+    height: 20vh;
+    margin-left: auto;
+    .details{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1.3rem;
+        .text{
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+    }
+}

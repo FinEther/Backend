@@ -1,0 +1,107 @@
+@import '../dashboard/dashboard.component.scss';
+
+.contenut{
+    padding: 0px;
+}
+.etage{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    box-sizing: border-box;
+}
+.carte{
+    margin: 0px;
+}
+.slot{
+    width: 100%;
+    table{
+        width: 100%;
+        height: 80%;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); 
+        .attribut{
+            margin: 1rem 0px;
+        }
+        .valeur{
+            width: 50%;
+            text-align: end;
+        }
+        .dot{
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+    }
+}
+.titre{
+    font-size: 1.3rem;
+    font-weight: 400;
+    margin-bottom: 0.7rem;
+}
+.composant{
+    width: 40%;
+    height: 20vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    .p1{
+        display: flex;
+        width: 100%;
+        align-items: center;
+        .dot{
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .pourcentage{
+            margin-left: auto;
+        }
+    }
+}
+.composant2{
+    width: 50%;
+    .titre{
+        width: 100%;
+    }
+    .elements{
+        display: flex;
+        justify-content: space-around;
+    }
+}
+.element{
+    height: 20vh;
+    width: 15vw;
+    border-radius: 10px;
+    background-color: aliceblue;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    .img{
+        height: 80px;
+        width: 80px;
+    }
+}
+.etage3{
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    .titre{
+        align-self: flex-start;
+    }
+    .zoneInves{
+        width: 90%;
+        height: 15vh;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); 
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+    }
+}

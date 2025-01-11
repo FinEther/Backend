@@ -1,0 +1,59 @@
+# bank-db-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bank-db
+  namespace: finether
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bank-db
+  template:
+    metadata:
+      labels:
+        app: bank-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:14.0
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: "1234"
+            - name: POSTGRES_DB
+              value: projet_python_bank
+          volumeMounts:
+            - name: bank-db-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: bank-db-data
+          persistentVolumeClaim:
+            claimName: bank-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bank-db-service
+  namespace: finether
+spec:
+  selector:
+    app: bank-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: bank-db-pvc
+  namespace: finether
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

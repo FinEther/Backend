@@ -1,0 +1,17 @@
+<div class="component">
+  <div class="titre">Vos Informations</div>
+    <form [formGroup]="userUpdate" (ngSubmit)="onFormSubmit()">
+      
+      <label for="full_name">Nom et Prénom:</label>
+      <input id="full_name" type="text" formControlName="full_name" placeholder="{{currentUser.full_name}}"/>
+
+      <label for="username">username:</label>
+      <input id="username" type="text" formControlName="username" placeholder="{{currentUser.username}}"/>
+
+      <label for="email" >Email:</label>
+      <input id="email" type="email" formControlName="email" placeholder="{{currentUser.email}}" />
+
+      <button type="submit">Confirmer</button>
+      <button type="reset" (click)="userUpdate.reset()">Annuler</button>
+    </form>
+</div>

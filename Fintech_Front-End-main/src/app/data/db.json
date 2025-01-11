@@ -1,0 +1,147 @@
+{
+  
+  "user":[
+    {
+      "id": 1,
+      "meta_mask_address": "0x15e778c300f165775fc60e0da0f5bee0c043a0fb",
+      "username": "SENBATIN",
+      "full_name": "SENBATI Nizar",
+      "email": "nizarSenbati@exemple.com",
+      "password": "123456"
+    }
+  ],
+  "carte": [
+    {
+    "account_number": 1764781548900913,
+    "expiry_date": "07/25",
+    "card_type": "visa",
+    "cvv": "011",
+    "currency": "ETH"
+    }
+  ],
+  "compte":[
+    {
+      "numCompte": 192649,
+      "numCarte": 1764781548900913,
+      "money": "ETH",
+      "dateExp": "01/25",
+      "balance": 584994,
+      "nbrTransaction": 11509,
+      "totalTransaction": 750013233,
+      "type": "visa",
+      "etat": "active",
+      "pretSold": 3500,
+      "paye": 1225
+    }
+  ],
+  "graph_data": [
+      { "date": "2023-01-01", "debit": 15693.08, "credit": 16230.93, "balance": 1000 },
+      { "date": "2023-02-01", "debit": 4366.46, "credit": 6597.25, "balance": 1200 },
+      { "date": "2023-03-01", "debit": 13033.66, "credit": 16554.31, "balance": 1100 },
+      { "date": "2023-04-01", "debit": 12842.28, "credit": 19595.92, "balance": 1300 },
+      { "date": "2023-05-01", "debit": 17690.33, "credit": 6549.32, "balance": 1400 }
+    ],
+  "notification": [
+      {
+        "titre": "Transaction Successful",
+        "objet": "You have successfully transferred $500 to John Doe.",
+        "date": "2024-10-02"
+      },
+      {
+        "titre": "Account Balance Low",
+        "objet": "Your account balance has dropped below the minimum required amount.",
+        "date": "2024-09-30"
+      },
+      {
+        "titre": "New Investment Opportunity",
+        "objet": "Check out the latest investment plans with high returns available now.",
+        "date": "2024-09-28"
+      },
+      {
+        "titre": "Unsuccessful Payment Attempt",
+        "objet": "A payment of $200 could not be processed due to insufficient funds.",
+        "date": "2024-09-25"
+      },
+      {
+        "titre": "Account Verification Complete",
+        "objet": "Your account has been successfully verified. You now have full access.",
+        "date": "2024-09-20"
+      },
+      {
+        "titre": "Suspicious Activity Alert",
+        "objet": "Unusual login detected in your account. Please verify recent activity.",
+        "date": "2024-09-18"
+      },
+      {
+        "titre": "Monthly Statement Available",
+        "objet": "Your monthly account statement is ready for review.",
+        "date": "2024-09-15"
+      },
+      {
+        "titre": "Loan Payment Due",
+        "objet": "Your next loan payment of $150 is due on October 15, 2024.",
+        "date": "2024-09-10"
+      },
+      {
+        "titre": "Interest Earned on Savings",
+        "objet": "You earned $20 in interest on your savings this month.",
+        "date": "2024-09-05"
+      },
+      {
+        "titre": "Account Password Changed",
+        "objet": "Your account password was successfully changed. If this wasn't you, please contact support.",
+        "date": "2024-09-01"
+      }
+  ],
+    "transaction": [
+      {
+      "account_number": 192649,
+      "amount": 250.75,
+      "date": "2024-09-25",
+      "transaction_type": "credit"
+      },
+      {
+      "account_number": 192649,
+      "amount": 150.00,
+      "date": "2024-09-28",
+      "transaction_type": "debit"
+      },
+      {
+      "account_number": 192649,
+      "amount": 500.00,
+      "date": "2024-10-01",
+      "transaction_type": "credit"
+      },
+      {
+      "account_number": 192649,
+      "amount": 120.50,
+      "date": "2024-10-02",
+      "transaction_type": "debit"
+      },
+      {
+      "account_number": 192649,
+      "amount": 300.25,
+      "date": "2024-10-05",
+      "transaction_type": "credit"
+      },
+      {
+      "account_number": 192649,
+      "amount": 450.00,
+      "date": "2024-10-07",
+      "transaction_type": "debit"
+      },
+      {
+      "account_number": 192649,
+      "amount": 200.00,
+      "date": "2024-10-10",
+      "transaction_type": "debit"
+      },
+      {
+      "account_number": 192649,
+      "amount": 275.35,
+      "date": "2024-10-12",
+      "transaction_type": "credit"
+      }
+    ]
+}
+      
