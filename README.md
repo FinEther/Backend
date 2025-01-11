@@ -25,10 +25,14 @@ This application utilizes cutting-edge technologies to deliver high-performance 
 - Microservices for modularity and scalability.
 - Blockchain and Web3 integration for secure and transparent transactions.
 - Containerized services for simplified deployment and scalability.
-- REST API and Kafka for communication between microservices.
+- REST API for communication between microservices.
 - Comprehensive monitoring and security measures.
 
-## ![Architecture Diagram](./figures/Architecture.png "System Architecture")
+## Architecture Diagram
+
+![Architecture Diagram](./figures/Architecture.png "System Architecture")
+
+---
 
 ## Tech Stack
 
@@ -43,21 +47,80 @@ This application utilizes cutting-edge technologies to deliver high-performance 
 
 ## Setup Instructions
 
-1. Clone the repository:
+### Option 1: Run Using Docker and Kubernetes
+
+1. **Clone the repository**:
+
    ```bash
    git clone https://github.com/FinEther/Backend.git
    cd fintech-app
    ```
-2. Configure the `.env` files for each microservice with the required environment variables.
-3. Build and start the containers:
+
+2. **Configure the `.env` files**:  
+   Set up the `.env` files for each microservice with the required environment variables.
+
+3. **Build and start the containers**:
+
    ```bash
    docker-compose up --build
    ```
-4. Deploy services on Kubernetes:
+
+4. **Deploy services on Kubernetes**:
+
    ```bash
    kubectl apply -f <service-name>/k8s/
    ```
-5. Access the frontend at `http://localhost:<frontend-port>`.
+
+5. **Access the frontend**:  
+   Open your browser and navigate to:
+   ```
+   http://localhost:<frontend-port>
+   ```
+
+---
+
+### Option 2: Run Using Jenkins Pipeline
+
+1. **Install Jenkins**:  
+   Ensure Jenkins is installed, running, and accessible.
+
+2. **Create a new pipeline**:
+
+   - Log in to the Jenkins dashboard.
+   - Click **New Item**.
+   - Select **Pipeline**, enter a name, and click **OK**.
+
+3. **Configure the pipeline**:
+
+   - In the pipeline settings, scroll to the **Pipeline** section.
+   - Set **Definition** to **Pipeline script from SCM**.
+   - Choose **Git** as the SCM and provide the repository URL:
+     ```plaintext
+     https://github.com/FinEther/Backend.git
+     ```
+   - Specify the branch (e.g., `main` or `master`).
+
+4. **Trigger the pipeline**:  
+   Click **Build Now** in Jenkins to clone the repository, build the project, and deploy the services.
+
+5. **Automate the pipeline** (optional):
+
+   - Add a webhook in GitHub to trigger the pipeline on code changes:
+     - Go to your GitHub repository **Settings**.
+     - Click **Webhooks** > **Add webhook**.
+     - Set the payload URL to:
+       ```
+       http://<jenkins-server>:8080/github-webhook/
+       ```
+
+6. **Monitor progress**:  
+   View the logs in Jenkins to track the pipeline status.
+
+7. **Access the frontend**:  
+   Once the pipeline completes, access the frontend at:
+   ```
+   http://localhost:<frontend-port>
+   ```
 
 ---
 
@@ -110,6 +173,23 @@ The application consists of the following services:
 - **Prometheus:** Collects metrics from microservices and Kubernetes nodes.
 - **Grafana:** Visualizes application performance metrics and resource usage.
 
+### Figures
+
+- **Docker Hub Overview:**
+  ![Dockerhub](./figures/Dockerhub.png)
+
+- **Jenkins Pipeline Overview:**
+  ![Jenkins Pipeline](./figures/jenkins%20pipeline.png)
+
+- **K9s Dashboard:**
+  ![K9s](./figures/K9s.png)
+
+- **Kubernetes Cluster Dashboard:**
+  ![Kubernetes Cluster](./figures/Kubernetes%20Cluster%20dashboard.png)
+
+- **Node Exporter Metrics:**
+  ![Node Exporter](./figures/Node%20Exporter%20dashboard.png)
+
 ---
 
 ## Deployment Details
@@ -132,3 +212,5 @@ The application supports:
 - **DevOps Engineer:** BAY BAY Badr
 - **Blockchain & Web3:** MOUTMAINE Aymane
 - **UI/UX Designer:** SENBATI Nizar
+
+---
