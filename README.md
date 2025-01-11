@@ -32,6 +32,14 @@ This application utilizes cutting-edge technologies to deliver high-performance 
 
 ![Architecture Diagram](./figures/Architecture.png "System Architecture")
 
+## Application Interface
+
+![Application Interface](./figure/image.png "Application Interface")
+
+## Homepage
+
+![Homepage](./figure/image_2025-01-11_195356237.png "Homepage")
+
 ---
 
 ## Tech Stack
