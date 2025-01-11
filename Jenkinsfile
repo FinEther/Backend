@@ -55,6 +55,12 @@ pipeline {
                         bat "docker build -t ${DOCKER_IMAGE_PREFIX}-frontend -f Fintech_Front-End-main/Dockerfile ./Fintech_Front-End-main"
                     }
                 }
+                stage('Build API Gateway Image') {
+                    steps {
+                        echo 'Building Docker image for API Gateway...'
+                        bat "docker build -t ${DOCKER_IMAGE_PREFIX}-gateway -f gateway/Dockerfile ./gateway"
+                    }
+                }
             }
         }
 
@@ -107,6 +113,16 @@ pipeline {
                             bat """
                                 docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%
                                 docker push ${DOCKER_IMAGE_PREFIX}-frontend
+                            """
+                        }
+                    }
+                }
+                stage('Push API Gateway Image') {
+                    steps {
+                        withCredentials([usernamePassword(credentialsId: 'DockerHub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                            bat """
+                                docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%
+                                docker push ${DOCKER_IMAGE_PREFIX}-gateway
                             """
                         }
                     }
