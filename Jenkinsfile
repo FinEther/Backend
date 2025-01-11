@@ -198,7 +198,7 @@ pipeline {
                         }
                     }
                 }
-                stage('Deploy Frontend Stack') {
+                stage('Deploy API Gateway Stack') {
                     steps {
                         withCredentials([file(credentialsId: 'MyKubeConfig', variable: 'KUBECONFIG')]) {
                             bat """
@@ -235,3 +235,5 @@ pipeline {
         }
     }
 }
+
+///
