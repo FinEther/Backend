@@ -34,11 +34,11 @@ This application utilizes cutting-edge technologies to deliver high-performance 
 
 ## Application Interface
 
-![Application Interface](./figure/image.png "Application Interface")
+![Application Interface](./figures/image.png "Application Interface")
 
 ## Homepage
 
-![Homepage](./figure/image_2025-01-11_195356237.png "Homepage")
+![Homepage](./figures/image_2025-01-11_195356237.png "Homepage")
 
 ---
 
