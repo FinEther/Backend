@@ -15,13 +15,13 @@ spec:
         app: user-service
     spec:
       containers:
-      - name: user-service
-        image: badryb/finether-user-service:v2
-        ports:
-        - containerPort: 8001
-        env:
-        - name: DATABASE_URL
-          value: postgresql://postgres:1234@user-db-service:5432/projet_python_user
+        - name: user-service
+          image: badryb/finether-user-service:v3
+          ports:
+            - containerPort: 8001
+          env:
+            - name: DATABASE_URL
+              value: postgresql://postgres:1234@user-db-service:5432/projet_python_user
 ---
 apiVersion: v1
 kind: Service
@@ -32,6 +32,6 @@ spec:
   selector:
     app: user-service
   ports:
-  - port: 8001
-    targetPort: 8001
+    - port: 8001
+      targetPort: 8001
   type: ClusterIP

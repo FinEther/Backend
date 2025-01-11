@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+  namespace: finether
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      containers:
+        - name: gateway
+          image: badryb/finether-gateway
+          ports:
+            - containerPort: 8005
+          env:
+            - name: USER_SERVICE_URL
+              value: http://user-service:8001
+            - name: ACCOUNTS_SERVICE_URL
+              value: http://accounts-service:8003
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  namespace: finether
+spec:
+  selector:
+    app: gateway
+  ports:
+    - port: 8005
+      targetPort: 8005
+  type: ClusterIP

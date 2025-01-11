@@ -8,6 +8,7 @@ services:
       - "8001:8001"
     environment:
       - DATABASE_URL=postgresql://postgres:1234@db_user:5432/projet_python_user
+      - NOTIFICATION_URL=http://notification_service:8004
     depends_on:
       - db_user
 
@@ -21,6 +22,28 @@ services:
     depends_on:
       - db_bank
 
+  notification_service:
+    build:
+      context: ./notification_service
+    ports:
+      - "8004:8004"
+    environment:
+      - DATABASE_URL=postgresql://postgres:1234@db_notification:5432/projet_python_notifications
+    depends_on:
+      - db_notification
+
+  gateway:
+    build:
+      context: ./gateway
+    ports:
+      - "8005:8005"
+    environment:
+      - USER_SERVICE_URL=http://user_service:8001
+      - ACCOUNTS_SERVICE_URL=http://accounts_service:8003
+    depends_on:
+      - user_service
+      - accounts_service
+
   accounts_service:
     build:
       context: ./accounts_service
@@ -30,11 +53,23 @@ services:
       - DATABASE_URL=postgresql://postgres:1234@db_accounts:5432/projet_python_accounts
       - USER_SERVICE_URL=http://user_service:8001
       - BANK_SERVICE_URL=http://bank_service:8002
+      - NOTIFICATION_URL=http://notification_service:8004
 
     depends_on:
       - db_accounts
       - user_service
       - bank_service
+
+
+  frontend:
+    build:
+      context: ./Fintech_Front-End-main
+    ports:
+      - "4200:80"
+    depends_on:
+      - gateway
+    environment:
+      - GATEWAY_URL=http://gateway:8005
 
   db_user:
     image: postgres:14.0
@@ -66,9 +101,20 @@ services:
       - postgres_data_accounts:/var/lib/postgresql/data
     ports:
       - "5437:5432"
+  db_notification:
+    image: postgres:14.0
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: projet_python_notifications
+    volumes:
+      - postgres_data_notifications:/var/lib/postgresql/data
+    ports:
+      - "5438:5432"
     
 
 volumes:
   postgres_data_user:
   postgres_data_bank:
   postgres_data_accounts:
+  postgres_data_notifications:

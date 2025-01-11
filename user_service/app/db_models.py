@@ -1,5 +1,4 @@
 from sqlalchemy import Boolean, Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
 from .database import engine,Base
 
 
@@ -12,5 +11,7 @@ class User(Base):
     full_name = Column(String, nullable=True)
     hashed_password = Column(String)
     disabled = Column(Boolean, default=False)
+    meta_mask_address = Column(String, unique=True, nullable=False)
+    nonce = Column(String, nullable=False)
 
 User.metadata.create_all(bind=engine)

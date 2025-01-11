@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: finether
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: badryb/finether-frontend
+          ports:
+            - containerPort: 80
+          env:
+            - name: GATEWAY_URL
+              value: "http://gateway:8005" # Update this if your gateway service URL changes
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: finether
+spec:
+  selector:
+    app: frontend
+  ports:
+    - port: 4200
+      targetPort: 80
+  type: LoadBalancer
